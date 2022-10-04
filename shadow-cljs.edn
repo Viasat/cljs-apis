@@ -1,0 +1,11 @@
+{:source-paths ["src/"]
+ :dependencies [[cljs-bean "1.8.0"]
+                [funcool/promesa "9.0.462"]]
+ ;; Add test target (https://www.abhinavomprakash.com/posts/running-cljs-tests/)
+ :builds {:cljs-apis
+          {:target :npm-module
+           :compiler-options {:optimizations :simple}
+           :entries [viasat.apis.github
+                     viasat.apis.rpm
+                     viasat.apis.artifactory]
+           :output-dir "dist"}}}
