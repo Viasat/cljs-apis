@@ -14,7 +14,8 @@
   (P/let
     [{:keys [username password]
       :or {username (aget js/process.env "ARTIFACTORY_USERNAME")
-           password (or (aget js/process.env "ARTIFACTORY_API_KEY")
+           password (or (aget js/process.env "ARTIFACTORY_IDENTITY_TOKEN")
+                        (aget js/process.env "ARTIFACTORY_API_KEY")
                         (aget js/process.env "ARTIFACTORY_PASSWORD"))}} opts
      prompt-schema [{:name "username"
                      :description "Artifactory Username"}
