@@ -70,19 +70,7 @@ Options:
               (Eprintln "Getting image names from repo:" repo)
               (art/get-images repo opts)))
    _ (Eprintln "Getting information (in parallel) for images:" images)
-   raw (P/all
-         (for [image images]
-           (P/let
-             [tags (art/get-image-tags repo image opts)
-              manifests (P/all
-                          (for [tag tags]
-                            (art/get-tag-manifest repo image tag opts)))
-              metadatas (P/all
-                          (for [tag tags]
-                            (art/get-tag-manifest-metadata repo image tag opts)))]
-             (map #(merge %3 %2 {:image image :tag %1})
-                  tags manifests metadatas))))
-   data (apply concat raw)]
+   data (artifactory/get-full-images repo images)]
 
   (schema-print data schema opts))
 

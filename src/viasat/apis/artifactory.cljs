@@ -60,3 +60,19 @@
           resp (axios url (clj->js (merge axios-opts
                                           {:params {:stats true}})))]
     (P/-> resp ->clj :data)))
+
+(defn get-full-images [repo images
+                       {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [raw (P/all
+                (for [image images]
+                  (P/let
+                    [tags (get-image-tags repo image opts)
+                     manifests (P/all (for [tag tags]
+                                        (get-tag-manifest
+                                          repo image tag opts)))
+                     metadatas (P/all (for [tag tags]
+                                        (get-tag-manifest-metadata
+                                          repo image tag opts)))]
+                    (map #(merge %3 %2 {:image image :tag %1})
+                         tags manifests metadatas))))]
+    (apply concat raw)))
