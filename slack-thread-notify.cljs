@@ -23,6 +23,7 @@ Options:
 
 (set! *warn-on-infer* false)
 
+
 (dotenv/config #js {:path ".secrets"})
 
 (P/let
@@ -31,7 +32,7 @@ Options:
    _ (when debug
        (Eprintln "Settings:") (Epprint opts))
    _ (when (not js/process.env.SLACK_BOT_TOKEN)
-       (Eprintln "SLACK_BOT_TOKEN not set, skipping notification")
+       (Eprintln "Error: SLACK_BOT_TOKEN not set")
        (js/process.exit 2))
 
    top-msg (->clj (js/JSON.parse top-msg))
