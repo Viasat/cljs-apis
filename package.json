@@ -22,6 +22,7 @@
     "@aws-sdk/lib-dynamodb": "^3.50.0",
     "@octokit/rest": "^19.0.4",
     "@viasat/cljs-utils": "^0.1.1",
+    "@slack/bolt": "^3.12.1",
     "adm-zip": "^0.5.9",
     "axios": "^0.27.2",
     "axios-debug-log": "^0.8.4",
