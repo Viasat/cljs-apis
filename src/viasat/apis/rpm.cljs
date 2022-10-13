@@ -39,7 +39,7 @@
      _ (dbg "Converting to JSON")
      primary (->clj (xml2json/toJson primary-data #js {:object true}))
      all-rpms (-> primary :metadata :package)
-     rpms (if rpm-names
+     rpms (if (seq rpm-names)
             (do
               (dbg "Filtering for rpm names" rpm-names)
               (filter #((set rpm-names) (:name %)) all-rpms))
