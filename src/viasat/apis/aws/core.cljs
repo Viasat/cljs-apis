@@ -57,9 +57,11 @@
 (defn invoke
   "Invoke AWS client command using opts map parameters. If response is
   paginated then repeatedly call the command and returned the full
-  collected result."
-  [client command {:keys [debug] :as opts}]
-  (P/let [client (if (or (keyword? client) (string? client))
+  collected result. If max-pages is set then only query that many pages."
+  [client command {:keys [debug max-pages] :as opts}]
+  (P/let [max-pages (cond (contains? #{nil :all "all"} max-pages) :all
+                          :else (js/parseInt max-pages))
+          client (if (or (keyword? client) (string? client))
                 (auth-client client opts)
                 client)
           client-name (-> client .-constructor .-name)
@@ -68,7 +70,7 @@
                     command)
           command-name (.-name Command)]
     (P/loop [result {}
-             opts (dissoc opts :profile :no-profile :region :debug)
+             opts (dissoc opts :profile :no-profile :region :debug :max-pages)
              page 1
              last-token nil]
       (when debug
@@ -82,7 +84,10 @@
                            :NextToken :nextToken
                            :nextBackwardToken :nextForwardToken)
               result (merge-with into result data)]
-        (if (and token (not= last-token token))
+        (if (and token
+                 (not= last-token token)
+                 (or (= :all max-pages)
+                     (< page max-pages)))
           (do (when debug
                 (Eprintln "AWS DEBUG - sending" client-name command-name
                           "again to get page" (inc page)))
