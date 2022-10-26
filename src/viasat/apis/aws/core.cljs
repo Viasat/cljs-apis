@@ -76,28 +76,36 @@
       (when debug
         (Eprintln "AWS DEBUG - sending" client-name command-name
                   "with opts" (pr-str opts)))
-      (P/let [command (Command. (clj->js opts))
-              data (P/-> (.send client command) ->clj)
-              {:keys [NextToken nextToken nextForwardToken]} data
-              token (or NextToken nextToken nextForwardToken)
-              data (dissoc data
-                           :NextToken :nextToken
-                           :nextBackwardToken :nextForwardToken)
-              result (merge-with into result data)]
-        (if (and token
-                 (not= last-token token)
-                 (or (= :all max-pages)
-                     (< page max-pages)))
-          (do (when debug
-                (Eprintln "AWS DEBUG - sending" client-name command-name
-                          "again to get page" (inc page)))
-              (P/recur result (merge opts (cond
-                                            NextToken {:NextToken NextToken}
-                                            nextToken {:nextToken nextToken}
-                                            nextForwardToken {:nextToken
-                                                              nextForwardToken}))
-                       (inc page) token))
-          result)))))
+      (P/catch
+        (P/let [command (Command. (clj->js opts))
+                data (P/-> (.send client command) ->clj)
+                {:keys [NextToken nextToken nextForwardToken]} data
+                token (or NextToken nextToken nextForwardToken)
+                data (dissoc data
+                             :NextToken :nextToken
+                             :nextBackwardToken :nextForwardToken)
+                result (merge-with into result data)]
+          (if (and token
+                   (not= last-token token)
+                   (or (= :all max-pages)
+                       (< page max-pages)))
+            (do (when debug
+                  (Eprintln "AWS DEBUG - sending" client-name command-name
+                            "again to get page" (inc page)))
+                (P/recur result (merge opts (cond
+                                              NextToken {:NextToken NextToken}
+                                              nextToken {:nextToken nextToken}
+                                              nextForwardToken {:nextToken
+                                                                nextForwardToken}))
+                         (inc page) token))
+            result))
+        (fn [err]
+          (if (= "Throttling" (.. err -Code))
+            (P/let [tdelay (.. err -$metadata -totalRetryDelay)
+                    _ (Eprintln "Throttled, delaying" tdelay "ms")
+                    _ (P/delay tdelay)]
+              (P/recur result opts page last-token))
+            (throw err)))))))
 
 (defn invoke-until
   "Invoke AWS Client Command using opts map parameters. Repeat the
