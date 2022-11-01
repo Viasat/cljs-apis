@@ -70,7 +70,7 @@ Options:
               (Eprintln "Getting image names from repo:" repo)
               (art/get-images repo opts)))
    _ (Eprintln "Getting information (in parallel) for images:" images)
-   data (artifactory/get-full-images repo images)]
+   data (art/get-full-images repo images opts)]
 
   (schema-print data schema opts))
 
