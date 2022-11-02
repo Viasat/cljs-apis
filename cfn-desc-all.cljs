@@ -20,12 +20,15 @@ Options:
   --region REGION        AWS region [env: REGION] [default: us-west-2]
   --parallel JOBS        Number of AWS API calls to run parallel
                          [default: 2]
+
+  --since DATE           Only show stacks created since DATE
+                         (up to max of 90 days ago).
 ")
 
 (P/let
   [cfg (parse-opts usage *command-line-args*)
    _ (when (empty? cfg) (js/process.exit 2))
-   {:keys [json-stack-file debug parallel]} cfg
+   {:keys [json-stack-file debug parallel since]} cfg
    aws-opts (select-keys cfg [:debug :profile :no-profile :region])
 
    _ (when debug (Eprintln "Settings:"))
@@ -33,6 +36,9 @@ Options:
    
    stack-list (P/->> (aws/invoke :CloudFormation :ListStacks aws-opts)
                      :StackSummaries)
+   stack-list (if since
+                (filter #(> (:CreationTime %) (js/Date. since)) stack-list)
+                stack-list)
    _ (Eprintln (str "Querying " (count stack-list) " stacks ("
                     parallel " at a time)"))
    stacks (P/loop [left stack-list
