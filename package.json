@@ -10,6 +10,7 @@
     "@aws-sdk/client-dynamodb": "^3.50.0",
     "@aws-sdk/client-ec2": "^3.50.0",
     "@aws-sdk/client-ecr": "^3.50.0",
+    "@aws-sdk/client-iam": "^3.204.0",
     "@aws-sdk/client-lambda": "^3.50.0",
     "@aws-sdk/client-pricing": "^3.50.0",
     "@aws-sdk/client-s3": "^3.50.0",

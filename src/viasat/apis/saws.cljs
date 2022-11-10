@@ -38,6 +38,7 @@ Options:
 (def service-aliases
   {"EC2"             :ec2
    "VPC"             :vpc
+   "IAM"             :iam
    "cf"              :cfn
    "cloudformation"  :cfn
    "cloud-formation" :cfn
@@ -52,6 +53,7 @@ Options:
   ;;         Client name
   {:ec2      "EC2"
    :vpc      "EC2"
+   :iam      "IAM"
    :cfn      "CloudFormation"
    :sc       "ServiceCatalog"
    :dynamodb "DynamoDB"
@@ -80,7 +82,7 @@ Options:
   (if (not schema)
     (let [ks (keys (dissoc response
                            :$metadata :NextToken :NextPageToken
-                           :TotalResultsCount))]
+                           :IsTruncated :Marker :TotalResultsCount))]
       (if (= 0 (count ks))
         []
         (if (= 1 (count ks))
