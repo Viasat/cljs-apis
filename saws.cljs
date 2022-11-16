@@ -11,7 +11,8 @@ Usage:
   saws ec2 ips [options]
   saws ec2 console [options] <instance-id>
 
-  saws vpc list [options]
+  saws vpc vpcs [options]
+  saws vpc subnets [options]
 
   saws <cf|cfn> list-all [options]
   saws <cf|cfn> list [options]
@@ -53,16 +54,26 @@ Usage:
                       :extract [:Reservations :Instances]}
    [:ec2 :console]   {:command "GetConsoleOutput"
                       :extract [:Output {:action :decode-base64}]}
-   [:vpc :list]      {:command "DescribeVpcs"
+
+   [:vpc :vpcs]      {:command "DescribeVpcs"
                       :fields [:VpcId
                                [:Name [:Tags [:Key "Name" :Value]]]
                                :CidrBlock
                                :State
                                :OwnerId
                                :DhcpOptionsId
-                               :InstanceTenancy
-                               :Ipv6CidrBlockAssociationSet
                                :IsDefault]}
+   [:vpc :subnets]   {:command "DescribeSubnets"
+                      :fields [:SubnetId
+                               [:Name [:Tags [:Key "Name" :Value]]]
+                               :VpcId
+                               :CidrBlock
+                               :State
+                               :OwnerId
+                               :AvailableIpAddressCount
+                               :AvailabilityZone
+                               :AvailabilityZoneId
+                               :DefaultForAz]}
 
    [:cfn :list-all]  {:command "ListStacks"
                       :fields [:StackId :StackStatus :CreationTime
