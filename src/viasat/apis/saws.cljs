@@ -75,7 +75,7 @@ Options:
 (def extract-actions
   {:raw           #(map identity %)
    :remove-nulls  #(filter identity %)
-   :decode-base64 #(map (fn [s] (.toString (.from js/Buffer s "base64"))) %)})
+   :decode-base64 #(->> % (filter some?) (map (fn [s] (.toString (.from js/Buffer s "base64")))))})
 
 (defn extract-data
   [response schema]
