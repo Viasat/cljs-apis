@@ -100,7 +100,7 @@
                          (inc page) token))
             result))
         (fn [err]
-          (if (= "Throttling" (.. err -Code))
+          (if (contains? #{"ThrottlingException" "TooManyRequestsException"} (.. err -name))
             (P/let [tdelay (.. err -$metadata -totalRetryDelay)
                     _ (Eprintln "Throttled, delaying" tdelay "ms")
                     _ (P/delay tdelay)]
