@@ -77,6 +77,21 @@ Options:
           result (aws/invoke :EC2 :DeleteNetworkInsightsPath (merge common-opts opts))]
     (get result :NetworkInsightsPathId)))
 
+(defn validate-rsc
+  "Validate resource."
+  [rsc]
+  (re-find #"^(eni|i|igw|pcx|tgw|vgw|vpce)-[0-9a-f]{8}([0-9a-f]{9})?$" rsc))
+
+(defn validate-ip
+  "Validate IP address."
+  [ip]
+  (re-find #"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$" ip))
+
+(defn validate-port
+  "Validate IP port."
+  [p]
+  (and p (> p 0) (<= p 65535)))
+
 (def SCHEMA
   {:fields [[:Seq [:SequenceNumber]]
             [:Id [:Component :Id]]
@@ -90,6 +105,11 @@ Options:
             ]})
 
 (P/let [opts (parse-opts usage *command-line-args*)
+        _ (if-let [rsc (:source opts)] (if-not (validate-rsc rsc) (throw (ex-info (str "Invalid source resource " rsc) {}))))
+        _ (if-let [rsc (:dest opts)] (if-not (validate-rsc rsc) (throw (ex-info (str "Invalid dest resource " rsc) {}))))
+        _ (if-let [ip (:source-ip opts)] (if-not (validate-ip ip) (throw (ex-info (str "Invalid source IP " ip) {}))))
+        _ (if-let [ip (:dest-ip opts)] (if-not (validate-ip ip) (throw (ex-info (str "Invalid dest IP " ip) {}))))
+        _ (if-let [port (:dest-port opts)] (if-not (validate-port port) (throw (ex-info (str "Invalid dest port " port) {}))))
         nip-id (create-network-insights-path opts)
         nia-id (start-network-insights-analysis opts nip-id)
         result (describe-network-insights-analysis-until
