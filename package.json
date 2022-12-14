@@ -29,6 +29,7 @@
     "axios-debug-log": "^0.8.4",
     "dotenv": "^16.0.3",
     "easy-table": "1.2.0",
+    "fs-extra": "^11.0.0",
     "nbb": "^0.7.132",
     "neodoc": "^2.0.2",
     "prompt": "^1.3.0",
