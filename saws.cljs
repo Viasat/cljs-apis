@@ -10,6 +10,8 @@ Usage:
   saws ec2 list [options]
   saws ec2 ips [options]
   saws ec2 console [options] <instance-id>
+  saws ec2 keys [options]
+  saws ec2 sgs [options]
 
   saws vpc vpcs [options]
   saws vpc subnets [options]
@@ -54,6 +56,8 @@ Usage:
                       :extract [:Reservations :Instances]}
    [:ec2 :console]   {:command "GetConsoleOutput"
                       :extract [:Output {:action :decode-base64}]}
+   [:ec2 :keys]      {:command "DescribeKeyPairs"}
+   [:ec2 :sgs]       {:command "DescribeSecurityGroups"}
 
    [:vpc :vpcs]      {:command "DescribeVpcs"
                       :fields [:VpcId
