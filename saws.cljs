@@ -9,6 +9,7 @@
 Usage:
   saws ec2 list [options]
   saws ec2 ips [options]
+  saws ec2 enis [options]
   saws ec2 console [options] <instance-id>
   saws ec2 keys [options]
   saws ec2 sgs [options]
@@ -54,6 +55,17 @@ Usage:
    [:ec2 :ips]       {:command "DescribeInstances"
                       :fields [:InstanceId :PrivateIpAddress]
                       :extract [:Reservations :Instances]}
+   [:ec2 :enis]       {:command "DescribeNetworkInterfaces"
+                       :fields [:NetworkInterfaceId
+                                :MacAddress
+                                :PrivateIpAddress
+                                :Status
+                                :VpcId
+                                :SubnetId
+                                :AvailabilityZone
+                                [:InstanceId [:Attachment :InstanceId]]
+                                [:Group [:Groups 0 :GroupId]]
+                                :Description]}
    [:ec2 :console]   {:command "GetConsoleOutput"
                       :extract [:Output {:action :decode-base64}]}
    [:ec2 :keys]      {:command "DescribeKeyPairs"}
