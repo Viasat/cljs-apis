@@ -63,6 +63,7 @@ Options:
   {:name                :Name
    :id                  :Id
    :instance-id         :InstanceId
+   :eni-id              :NetworkInterfaceId
    :stack               :StackName
    :product             :ProductName
    :product-id          :ProductId
