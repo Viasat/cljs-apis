@@ -17,7 +17,7 @@
         aws-module (js/require mod-name)
         obj (aget aws-module item)]
     (when (not obj)
-      (throw (ex-info (str obj " not found in " mod-name) {})))
+      (throw (ex-info (str item " not found in " mod-name) {})))
     obj))
 
 (declare invoke)
