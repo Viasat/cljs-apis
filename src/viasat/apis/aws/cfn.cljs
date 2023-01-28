@@ -57,6 +57,7 @@
      cmd-opts (merge {:DocumentName "AWS-RunShellScript"
                       :Comment "stack-run command execution"
                       :MaxErrors "100%"
+                      :MaxConcurrency "100%"
                       :TimeoutSeconds timeout
                       :Parameters {:commands [cmd]
                                    :workingDirectory [work-dir]}}
