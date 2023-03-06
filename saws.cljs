@@ -12,6 +12,7 @@ Usage:
   saws ec2 console [options] <instance-id>
   saws ec2 keys [options]
   saws ec2 sgs [options]
+  saws ec2 sg-rules [options]
   saws ec2 enis [options]
   saws ec2 delete-eni [options] <eni-id>
 
@@ -60,6 +61,17 @@ Usage:
                       :extract [:Output {:action :decode-base64}]}
    [:ec2 :keys]      {:command "DescribeKeyPairs"}
    [:ec2 :sgs]       {:command "DescribeSecurityGroups"}
+   [:ec2 :sg-rules]  {:command "DescribeSecurityGroupRules"
+                      :fields [:GroupId
+                               ;;:SecurityGroupRuleId
+                               :IsEgress
+                               :IpProtocol
+                               :CidrIpv4
+                               ;;:CidrIpv6
+                               :FromPort
+                               :ToPort
+                               :Description]
+                      :sort :GroupId}
    [:ec2 :enis]      {:command "DescribeNetworkInterfaces"
                       :fields [:NetworkInterfaceId
                                :MacAddress
