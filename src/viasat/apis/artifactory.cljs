@@ -48,15 +48,23 @@
           resp (axios url (clj->js axios-opts))]
     (P/-> resp ->clj :data :tags)))
 
+(defn get-manifest-uri [repo image tag
+                        {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [types #{"/manifest.json" "/list.manifest.json"}
+          url (str artifactory-api "/storage/" repo "/" image "/" tag)
+          resp (axios url (clj->js axios-opts))
+          manifest (->> resp ->clj :data :children (map :uri) (filter types) first)]
+    (str url manifest)))
+
 (defn get-tag-manifest [repo image tag
                         {:keys [artifactory-api axios-opts] :as opts}]
-  (P/let [url (str artifactory-api "/storage/" repo "/" image "/" tag "/manifest.json")
+  (P/let [url (get-manifest-uri repo image tag opts)
           resp (axios url (clj->js axios-opts))]
     (P/-> resp ->clj :data)))
 
 (defn get-tag-manifest-metadata [repo image tag
                                  {:keys [artifactory-api axios-opts] :as opts}]
-  (P/let [url (str artifactory-api "/storage/" repo "/" image "/" tag "/manifest.json")
+  (P/let [url (get-manifest-uri repo image tag opts)
           resp (axios url (clj->js (merge axios-opts
                                           {:params {:stats true}})))]
     (P/-> resp ->clj :data)))
