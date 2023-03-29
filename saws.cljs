@@ -43,7 +43,10 @@ Usage:
 
   saws ecr repos [options]
   saws ecr tags [options] <repo>
-  saws ecr list [options] <repo>")
+  saws ecr list [options] <repo>
+
+  saws ssm params [options]
+  saws ssm delete-param [options] <name>")
 
 (def command-schemas
   {[:ec2 :list]      {:command "DescribeInstances"
@@ -179,7 +182,18 @@ Usage:
                                :imageSizeInBytes
                                :lastRecordedPullTime
                                :imageTags]
-                      :sort :imagePushedAt}})
+                      :sort :imagePushedAt}
+   [:ssm :params]    {:command "DescribeParameters"
+                      :fields [:Name
+                               :DataType
+                               :Description
+                               :Type
+                               :Tier
+                               :Version
+                               :LastModifiedDate
+                               :LastModifiedUser]}
+   [:ssm :delete-param] {:command "DeleteParameter"
+                         :extract [{:action :raw}]}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

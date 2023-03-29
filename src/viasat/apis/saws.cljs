@@ -47,7 +47,8 @@ Options:
    "servicecatalog"  :sc
    "service-catalog" :sc
    "db"              :dynamodb
-   "dynamo"          :dynamodb})
+   "dynamo"          :dynamodb
+   "SSM"             :ssm})
 
 (def client-aliases
   ;;         Client name
@@ -57,7 +58,8 @@ Options:
    :cfn      "CloudFormation"
    :sc       "ServiceCatalog"
    :dynamodb "DynamoDB"
-   :ecr      "ECR"})
+   :ecr      "ECR"
+   :ssm      "SSM"})
 
 (def arg->param
   {:name                :Name
@@ -108,7 +110,7 @@ Options:
 (defn arg->keyword [arg]
   (keyword (second (first (re-seq #"^:?(.*)$" arg)))))
 
-(def TIME-REGEX #"Time$|^createdAt|^imagePushedAt$")
+(def TIME-REGEX #"Time$|^createdAt|^imagePushedAt$|^LastModifiedDate$")
 
 (defn run
   "Invoke an AWS service API command, extract the data, and print the
