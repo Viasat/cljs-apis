@@ -14,6 +14,7 @@ Usage:
   saws ec2 sgs [options]
   saws ec2 sg-rules [options]
   saws ec2 enis [options]
+  saws ec2 amis [options]
   saws ec2 delete-eni [options] <eni-id>
 
   saws vpc vpcs [options]
@@ -88,6 +89,17 @@ Usage:
                                [:InstanceId [:Attachment :InstanceId]]
                                [:Group [:Groups 0 :GroupId]]
                                :Description]}
+   [:ec2 :amis]      {:command "DescribeImages"
+                      :parameters {:Owners ["self"]}
+                      :fields [:ImageId
+                               :Name
+                               :Description
+                               :CreationDate
+                               :OwnerId
+                               :State
+                               :RootDeviceName
+                               :PlatformDetails]
+                      :sort :CreationDate}
    [:ec2 :delete-eni] {:command "DeleteNetworkInterface"
                        :extract [{:action :raw}]}
 
