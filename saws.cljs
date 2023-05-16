@@ -29,6 +29,7 @@ Usage:
   saws <cf|cfn> status [options] <stack>
   saws <cf|cfn> delete [options] <stack>
 
+  saws sc portfolios [options]
   saws sc products [options]
   saws sc versions [options] <product-id>
   saws sc delete-version [options] <product-id> <artifact-version-id>
@@ -142,6 +143,8 @@ Usage:
    [:cfn :delete]    {:command "DeleteStack"
                       :extract [{:action :raw}]}
 
+   [:sc  :portfolios] {:command "ListPortfolios"
+                       :fields [:Id :DisplayName :Description :CreatedTime :ProviderName :ARN]}
    [:sc  :products]  {:command "SearchProducts"
                       :fields [:ProductId :Name :ShortDescription]
                       :extract [:ProductViewSummaries]}
