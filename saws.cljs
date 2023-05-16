@@ -56,7 +56,8 @@ Usage:
                                [:State [:State :Name]]
                                :PrivateIpAddress
                                :KeyName
-                               :InstanceType]
+                               :InstanceType
+                               :LaunchTime]
                       :extract [:Reservations :Instances]}
    [:ec2 :ips]       {:command "DescribeInstances"
                       :fields [:InstanceId :PrivateIpAddress]
