@@ -143,8 +143,11 @@ Options:
                         (get command-schema :extract))
 
        aws-opts (select-keys cfg [:debug :profile :no-profile :region :role-arn])
+       schema-params (get command-schema :parameters)
        user-params (when parameters (edn/read-string parameters))
-       cmd-params (merge aws-opts user-params
+       cmd-params (merge aws-opts
+                         schema-params
+                         user-params
                          (reduce
                            (fn [params [k v]]
                              (if (contains? arg->param k)
