@@ -98,7 +98,9 @@ Usage:
                                :OwnerId
                                :State
                                :RootDeviceName
-                               :PlatformDetails]
+                               :PlatformDetails
+                               [:Base_AMI_ID [:Tags [:Key "Base_AMI_ID" :Value]]]
+                               [:Base_AMI_Name [:Tags [:Key "Base_AMI_Name" :Value]]]]
                       :sort :CreationDate}
    [:ec2 :delete-eni] {:command "DeleteNetworkInterface"
                        :extract [{:action :raw}]}
