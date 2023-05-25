@@ -18,6 +18,57 @@
 * `viasat.apis.rpm`: functions for querying RPMs in a repomd-style repo.
 * `viasat.apis.github`: functions for all Github/GHE APIs
 
+## Command Usage
+
+### ghe
+
+Refer to the API reference at https://octokit.github.io/rest.js/v19
+
+* Get all orgs as formatted JSON:
+
+```
+./ghe orgs list | jq '.' | less
+```
+
+* Show number of repos in `foo` org:
+
+```
+./ghe repos listForOrg org=foo | jq 'length'
+```
+
+* Return (JSON) all open pull requests for `foo/bar` repo in tabular form:
+
+```
+./ghe --owner foo --repo bar pulls list state=open
+```
+
+* List (in tabular form) all workflows for `bar` repo:
+
+```
+./ghe --table --owner foo --repo bar actions listRepoWorkflows
+```
+
+* List (in tabular form) all workflow runs for `bar` repo workflow ID 2129:
+
+```
+./ghe --table --owner foo --repo bar actions listWorkflowRuns workflow_id=2129
+```
+
+### rpm-repo-query
+
+* List CentOS 8 extra RPM packages:
+
+```
+./rpm-repo-query http://mirror.centos.org/centos-8/8/extras/x86_64/os/
+RPM_REPO_BASE_URL=http://mirror.centos.org ./rpm-repo-query centos-8/8/extras/x86_64/os/
+```
+
+* Filter to only versions for a single RPM package:
+
+```
+./rpm-repo-query centos-8/8/extras/x86_64/os/ centos-release-stream
+```
+
 
 ## Build JS code
 
