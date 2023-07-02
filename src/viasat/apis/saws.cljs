@@ -14,7 +14,7 @@ Usage:
 
 (def usage-options "
 Options:
-  --verbose              Verbose output [env: VERBOSE]
+  -v, --verbose          Verbose output [env: VERBOSE]
   --debug                Show debug/trace output (stderr) [env: DEBUG]
   --profile PROFILE      AWS profile [env: PROFILE] [default: saml]
   --no-profile           Do not use a profile value

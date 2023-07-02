@@ -14,7 +14,7 @@ Usage:
   stack-run [options] <stack> <cmd-args> <cmd-args>...
 
 Options:
-  --verbose            Verbose output (show instance IDs too) [env: VERBOSE]
+  -v, --verbose        Verbose output (show instance IDs too) [env: VERBOSE]
   --debug              Show debug/trace output (stderr) [env: DEBUG]
   --quiet              Show only result output.
   --no-prefix          Do not print status/host prefix in output

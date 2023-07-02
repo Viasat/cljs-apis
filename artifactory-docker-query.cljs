@@ -14,7 +14,7 @@ Usage:
 
 Options:
   --debug                  Debug output [env: DEBUG]
-  --verbose                Verbose output [env: VERBOSE]
+  -v, --verbose            Verbose output [env: VERBOSE]
   --artifactory-api URL    Artifactory base API URL
                            [env: ARTIFACTORY_BASE_URL]
 
