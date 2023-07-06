@@ -34,7 +34,7 @@
 
           sts-opts (merge (dissoc opts :role-arn)
                           {:RoleArn role-arn
-                           :RoleSessionName "session1"
+                           :RoleSessionName "cljs-utils-session1"
                            :DurationSeconds 900})
           prov-opts (merge (when (not no-profile)
                              {:profile profile})
