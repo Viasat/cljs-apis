@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+CUR_DIR=$(readlink -f $(dirname "${0}"))
 TOP_DIR=$(dirname $(readlink -f "${0}"))
 SCRIPT_NAME=$(basename "${0}")
-NBB=${TOP_DIR}/node_modules/.bin/nbb
+NBB=$(which 2>/dev/null ${CUR_DIR}/node_modules/.bin/nbb ${TOP_DIR}/node_modules/.bin/nbb | head -n1)
 
 die() { echo >&2 "${*}"; exit 1; }
 
 [ -e "${NBB}" ] || die "Missing ${NBB}. Maybe run 'npm install' in ${TOP_DIR}?"
 
-exec ${NBB} -cp "${TOP_DIR}/src":"${TOP_DIR}/node_modules/@viasat/cljs-utils/src" "${TOP_DIR}"/${SCRIPT_NAME}.cljs "${@}"
+NODE_PATH="${CUR_DIR}/node_modules":"${TOP_DIR}/node_modules" \
+    exec ${NBB} -cp "${CUR_DIR}/src":"${TOP_DIR}/src":"${CUR_DIR}/node_modules/@viasat/cljs-utils/src":"${TOP_DIR}/node_modules/@viasat/cljs-utils/src" \
+    "${TOP_DIR}"/${SCRIPT_NAME}.cljs "${@}"
