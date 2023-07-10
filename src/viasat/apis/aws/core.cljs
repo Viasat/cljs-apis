@@ -62,8 +62,8 @@
   (P/let [max-pages (cond (contains? #{nil :all "all"} max-pages) :all
                           :else (js/parseInt max-pages))
           client (if (or (keyword? client) (string? client))
-                (auth-client client opts)
-                client)
+                   (auth-client client opts)
+                   client)
           client-name (-> client .-constructor .-name)
           Command (if (or (keyword? command) (string? command))
                     (sdk-load "client" client-name (str (name command) "Command"))
@@ -160,4 +160,3 @@
                         (= (str value) (str (get tag-map tag))))
                       tags-values)))
           objects))
-
