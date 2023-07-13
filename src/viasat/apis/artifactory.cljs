@@ -2,36 +2,20 @@
   (:require [clojure.pprint :refer [pprint]]
             [promesa.core :as P]
             [cljs-bean.core :refer [->clj]]
-            ["dotenv$default" :as dotenv]
-            ["axios$default" :as axios]
-            ["prompt$default" :as prompt]))
+            ["axios$default" :as axios]))
 
 (defn enable-debug []
   (js/require "axios-debug-log/enable"))
 
 (defn get-auth-headers [opts]
-  (dotenv/config #js {:path ".secrets"})
-  (P/let
-    [{:keys [username password]
-      :or {username (aget js/process.env "ARTIFACTORY_USERNAME")
-           password (or (aget js/process.env "ARTIFACTORY_IDENTITY_TOKEN")
-                        (aget js/process.env "ARTIFACTORY_API_KEY")
-                        (aget js/process.env "ARTIFACTORY_PASSWORD"))}} opts
-     prompt-schema [{:name "username"
-                     :description "Artifactory Username"}
-                    {:name "password"
-                     :description "Artifactory Password/API Key"
-                     :hidden true}]
-     overrides (merge {}
-                      (when username {:username username})
-                      (when password {:password password}))
-     _ (set! (.-override prompt) (clj->js overrides))
-     _ (set! (.-message prompt) "Please enter")
-     {:keys [username password]}
-     , (P/-> (.get prompt (clj->js prompt-schema)) ->clj)
-     auth-token (->
-                  (js/Buffer.from (str username ":" password))
-                  (.toString "base64"))]
+  (let [{:keys [artifactory-username
+                artifactory-identity-token]} opts
+        auth-token (if (and artifactory-username
+                            artifactory-identity-token)
+                     (->
+                       (js/Buffer.from (str artifactory-username ":" artifactory-identity-token))
+                       (.toString "base64"))
+                     (throw (js/Error. "Artifactory username and identity token required.")))]
     {:Authorization (str "Basic " auth-token)
      :Content-Type "application/json"}))
 
