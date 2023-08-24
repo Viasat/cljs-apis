@@ -7,8 +7,7 @@
             [viasat.util :refer [parse-opts Eprintln Eprn Epprint]]
             [viasat.schema-print :refer [schema-print]]
             [viasat.apis.artifactory :as art]
-            ["dotenv$default" :as dotenv]
-            ["prompt$default" :as prompt]))
+            ["dotenv$default" :as dotenv]))
 
 (def usage "
 Usage:
@@ -60,21 +59,6 @@ Options:
 
 (def TIME-REGEX #"^lastDownloaded")
 
-(defn prompt-when-missing-credentials [opts]
-  (P/let [{:keys [artifactory-username artifactory-identity-token]} opts
-          prompt-schema [{:name "artifactory-username"
-                          :description "Artifactory Username"}
-                         {:name "artifactory-identity-token"
-                          :description "Artifactory API Token"
-                          :hidden true}]
-          overrides (merge {}
-                           (when artifactory-username {:artifactory-username artifactory-username})
-                           (when artifactory-identity-token {:artifactory-identity-token artifactory-identity-token}))
-          _ (set! (.-override prompt) (clj->js overrides))
-          _ (set! (.-message prompt) "Please enter")
-          prompt-results (P/-> (.get prompt (clj->js prompt-schema)) ->clj)]
-    (merge opts prompt-results)))
-
 (P/let
   [_ (dotenv/config #js {:path ".secrets"})
    opts (parse-opts usage (or *command-line-args* []))
@@ -84,7 +68,7 @@ Options:
        (Epprint {:opts opts})
        (art/enable-debug))
 
-   opts (prompt-when-missing-credentials opts)
+   opts (art/prompt-when-missing-credentials opts)
 
    auth-headers (art/get-auth-headers opts)
    opts (assoc opts

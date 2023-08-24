@@ -2,10 +2,26 @@
   (:require [clojure.pprint :refer [pprint]]
             [promesa.core :as P]
             [cljs-bean.core :refer [->clj]]
-            ["axios$default" :as axios]))
+            ["axios$default" :as axios]
+            ["prompt$default" :as prompt]))
 
 (defn enable-debug []
   (js/require "axios-debug-log/enable"))
+
+(defn prompt-when-missing-credentials [opts]
+  (P/let [{:keys [artifactory-username artifactory-identity-token]} opts
+          prompt-schema [{:name "artifactory-username"
+                          :description "Artifactory Username"}
+                         {:name "artifactory-identity-token"
+                          :description "Artifactory API Token"
+                          :hidden true}]
+          overrides (merge {}
+                           (when artifactory-username {:artifactory-username artifactory-username})
+                           (when artifactory-identity-token {:artifactory-identity-token artifactory-identity-token}))
+          _ (set! (.-override prompt) (clj->js overrides))
+          _ (set! (.-message prompt) "Please enter")
+          prompt-results (P/-> (.get prompt (clj->js prompt-schema)) ->clj)]
+    (merge opts prompt-results)))
 
 (defn get-auth-headers [opts]
   (let [{:keys [artifactory-username
