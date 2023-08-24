@@ -84,3 +84,35 @@
                     (map #(merge %3 %2 {:image image :tag %1})
                          tags manifests metadatas))))]
     (apply concat raw)))
+
+(defn get-npm-modules [repo
+                  {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [url (str artifactory-api "/search/artifact" )
+          opts (merge axios-opts
+                      {:params {:repos repo
+                                :name "package.json"}})
+          resp (axios url (clj->js opts))]
+    (P/->> resp ->clj :data :results
+           (map #(->> (:uri %)
+                      (re-seq #"/.npm/(.*)/package.json")
+                      first second)))))
+
+(defn get-npm-module [repo module
+                      {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [url (str artifactory-api "/npm/" repo "/" module)
+          resp (axios url (clj->js axios-opts))]
+    (P/-> resp ->clj :data)))
+
+(defn get-npm-full-modules [repo modules
+                            {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [raw (P/all
+                (for [module modules]
+                  (P/let
+                    [data (get-npm-module repo module opts)
+                     versions (-> data :versions)]
+                    (map (fn [[vkey vdata]]
+                           (merge vdata
+                                  {:created (get-in data [:time vkey])}))
+                         versions))))]
+    (apply concat raw)))
+
