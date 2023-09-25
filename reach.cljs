@@ -21,6 +21,7 @@ Options:
   --source-ip IP      Address of the resource that is the start of the path
   --dest-ip IP        Address of the resource that is the end of the path
   --dest-port PORT    Destination port
+  --no-delete         Do not delete the AWS paths and analysis resources
 
   --fields FIELDS        Fields to print (comma or space separated)
   --sort FIELD           Sort using FIELD
@@ -39,7 +40,10 @@ Options:
   (P/let [common-opts (select-keys opts [:profile :region :debug])
           base-opts {:Source (:source opts)
                      :Destination (:dest opts)
-                     :Protocol (:proto opts)}
+                     :Protocol (:proto opts)
+                     :TagSpecifications [{:ResourceType "network-insights-path"
+                                          :Tags [{:Key "Name"
+                                                  :Value "cljs_utils_reach_cli"}]}]}
           cmd-opts (merge common-opts
                           base-opts
                           (if-let [source-ip (:source-ip opts)] {:SourceIp source-ip})
@@ -116,9 +120,10 @@ Options:
         nip-id (create-network-insights-path opts)
         nia-id (start-network-insights-analysis opts nip-id)
         result (describe-network-insights-analysis-until
-                (fn [res] (not= "running" (-> res :NetworkInsightsAnalyses first :Status))) opts nia-id)
-        _ (delete-network-insights-analysis opts nia-id)
-        _ (delete-network-insights-path opts nip-id)]
+                (fn [res] (not= "running" (-> res :NetworkInsightsAnalyses first :Status))) opts nia-id)]
+  (when-not (:no-delete opts)
+    (delete-network-insights-analysis opts nia-id)
+    (delete-network-insights-path opts nip-id))
   (Eprintln "Status:" (:Status result) "\n")
   (doseq [direction [:ForwardPathComponents :ReturnPathComponents]]
     (when (not (:no-headers opts))
