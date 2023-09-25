@@ -37,12 +37,15 @@ Options:
   "Create a Network Insights Path resource and return the ID."
   [opts]
   (P/let [common-opts (select-keys opts [:profile :region :debug])
-          opts {:Source (:source opts) :Destination (:dest opts) :Protocol (:proto opts)}
-          result (aws/invoke :EC2 :CreateNetworkInsightsPath
-                             (merge common-opts opts
-                                    (if-let [source-ip (:source-ip opts)] {:SourceIp source-ip})
-                                    (if-let [dest-ip (:dest-ip opts)] {:DestinationIp dest-ip})
-                                    (if-let [dest-port (:dest-port opts)] {:DestinationPort dest-port})))]
+          base-opts {:Source (:source opts)
+                     :Destination (:dest opts)
+                     :Protocol (:proto opts)}
+          cmd-opts (merge common-opts
+                          base-opts
+                          (if-let [source-ip (:source-ip opts)] {:SourceIp source-ip})
+                          (if-let [dest-ip (:dest-ip opts)] {:DestinationIp dest-ip})
+                          (if-let [dest-port (:dest-port opts)] {:DestinationPort dest-port}))
+          result (aws/invoke :EC2 :CreateNetworkInsightsPath cmd-opts)]
     (get-in result [:NetworkInsightsPath :NetworkInsightsPathId])))
 
 (defn start-network-insights-analysis
