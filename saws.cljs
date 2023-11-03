@@ -7,6 +7,25 @@
 
 (def usage-aliases "
 Usage:
+  saws iam users [options]
+  saws iam user-groups [options] <user-name>
+  saws iam user-inline-policies [options] <user-name>
+  saws iam user-attached-policies [options] <user-name>
+
+  saws iam groups [options]
+  saws iam group-inline-policies [options] <group-name>
+  saws iam group-attached-policies [options] <group-name>
+
+  saws iam roles [options]
+  saws iam role-inline-policies [options] <role-name>
+  saws iam role-attached-policies [options] <role-name>
+
+  saws iam policies [options]
+  saws iam policy-doc [options] <policy-arn> <policy-version>
+  saws iam policy-users [options] <policy-arn>
+  saws iam policy-groups [options] <policy-arn>
+  saws iam policy-roles [options] <policy-arn>
+
   saws ec2 list [options]
   saws ec2 ips [options]
   saws ec2 console [options] <instance-id>
@@ -51,7 +70,39 @@ Usage:
   saws ssm delete-param [options] <name>")
 
 (def command-schemas
-  {[:ec2 :list]      {:command "DescribeInstances"
+  {[:iam :users]     {:command "ListUsers"
+                      :fields [:UserId :UserName :Arn :CreateDate
+                               :PasswordLastUsed] }
+   [:iam :user-groups] {:command "ListGroupsForUser"}
+   [:iam :user-inline-policies] {:command "ListUserPolicies"}
+   [:iam :user-attached-policies] {:command "ListAttachedUserPolicies"}
+
+   [:iam :groups]    {:command "ListGroups"
+                      :fields [:GroupId  :GroupName :Arn :CreateDate]}
+   [:iam :group-inline-policies] {:command "ListGroupPolicies"}
+   [:iam :group-attached-policies] {:command "ListAttachedGroupPolicies"}
+
+   [:iam :roles]     {:command "ListRoles"
+                      :fields [:RoleId :RoleName :Description :Arn :CreateDate
+                                :MaxSessionDuration :Tags :RoleLastUsed]}
+   [:iam :role-inline-policies] {:command "ListRolePolicies"}
+   [:iam :role-attached-policies] {:command "ListAttachedRolePolicies"}
+
+   [:iam :policies]  {:command "ListPolicies"
+                      :fields [:PolicyId :PolicyName :Description
+                               :Arn :DefaultVersionId
+                               :AttachmentCount :IsAttachable
+                               :CreateDate :UpdateDate]}
+   [:iam :policy-doc] {:command "GetPolicyVersion"
+                        :extract [:PolicyVersion :Document {:action :decode-url}] }
+   [:iam :policy-users]  {:command "ListEntitiesForPolicy"
+                           :extract [:PolicyUsers]}
+   [:iam :policy-groups]  {:command "ListEntitiesForPolicy"
+                           :extract [:PolicyGroups]}
+   [:iam :policy-roles]  {:command "ListEntitiesForPolicy"
+                           :extract [:PolicyRoles]}
+
+   [:ec2 :list]      {:command "DescribeInstances"
                       :fields [:InstanceId
                                [:Name [:Tags [:Key "Name" :Value]]]
                                [:State [:State :Name]]

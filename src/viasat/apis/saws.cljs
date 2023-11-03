@@ -73,12 +73,18 @@ Options:
    :artifact-version-id :ProvisioningArtifactId
    :table               :TableName
    :prov-name           :ProvisionedProductName
-   :repo                :repositoryName})
+   :repo                :repositoryName
+   :user-name           :UserName
+   :group-name          :GroupName
+   :role-name           :RoleName
+   :policy-arn          :PolicyArn
+   :policy-version      :VersionId})
 
 (def extract-actions
   {:raw           #(map identity %)
    :remove-nulls  #(filter identity %)
-   :decode-base64 #(->> % (filter some?) (map (fn [s] (.toString (.from js/Buffer s "base64")))))})
+   :decode-base64 #(->> % (filter some?) (map (fn [s] (.toString (.from js/Buffer s "base64")))))
+   :decode-url    #(map js/decodeURIComponent %)})
 
 (defn extract-data
   [response schema]
@@ -110,7 +116,7 @@ Options:
 (defn arg->keyword [arg]
   (keyword (second (first (re-seq #"^:?(.*)$" arg)))))
 
-(def TIME-REGEX #"Time$|^createdAt|^imagePushedAt$|^LastModifiedDate$")
+(def TIME-REGEX #"Time$|Date$|^createdAt|^imagePushedAt$")
 
 (defn run
   "Invoke an AWS service API command, extract the data, and print the
