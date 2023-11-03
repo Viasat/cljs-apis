@@ -17,6 +17,7 @@ Options:
   --profile PROFILE      AWS profile [env: PROFILE] [default: saml]
   --no-profile           Do not use a profile value
                          [env: NO_PROFILE]
+  --role-arn             ARN of role to use assume for execution
   --region REGION        AWS region [env: REGION] [default: us-west-2]
   --parallel JOBS        Number of AWS API calls to run parallel
                          [default: 2]
@@ -29,7 +30,7 @@ Options:
   [cfg (parse-opts usage *command-line-args*)
    _ (when (empty? cfg) (js/process.exit 2))
    {:keys [json-stack-file debug parallel since]} cfg
-   aws-opts (select-keys cfg [:debug :profile :no-profile :region])
+   aws-opts (select-keys cfg [:debug :profile :no-profile :region :role-arn])
 
    _ (when debug (Eprintln "Settings:"))
    _ (when debug (Epprint cfg))
