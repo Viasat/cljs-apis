@@ -3,7 +3,7 @@
             [promesa.core :as P]
             ["fs-extra$default" :as fs]
             [viasat.util :refer [parse-opts Eprintln Epprint Eprn]]
-            [viasat.apis.aws.core :as aws]))
+            [viasat.apis.aws.cfn :as cfn]))
 
 (def usage "
 Usage:
@@ -34,29 +34,11 @@ Options:
 
    _ (when debug (Eprintln "Settings:"))
    _ (when debug (Epprint cfg))
-   
-   stack-list (P/->> (aws/invoke :CloudFormation :ListStacks aws-opts)
-                     :StackSummaries)
-   stack-list (if since
-                (filter #(> (:CreationTime %) (js/Date. since)) stack-list)
-                stack-list)
-   _ (Eprintln (str "Querying " (count stack-list) " stacks ("
-                    parallel " at a time)"))
-   stacks (P/loop [left stack-list
-                   res []] 
-            (if (empty? left)
-              res
-              (P/let [schunk (take parallel left)
-                      r (P/all
-                          (for [stack schunk]
-                            (aws/invoke
-                              :CloudFormation :DescribeStacks
-                              (merge aws-opts
-                                     {:StackName (:StackId stack)}))))
-                      res (apply conj res (mapcat :Stacks r))]
 
-                _ (Eprintln (str "Queried " (count res) "/" (count stack-list)))
-                (P/recur (drop parallel left) res))))]
+   filter-fn (when since #(> (:CreationTime %) (js/Date. since)))
+   stacks (cfn/describe-all-stacks (merge aws-opts
+                                          {:parallel parallel
+                                           :filter-fn filter-fn
+                                           :log-fn Eprintln}))]
   (Eprintln "Writing JSON results to:" json-stack-file)
   (fs/writeFile json-stack-file (js/JSON.stringify (clj->js stacks))))
-

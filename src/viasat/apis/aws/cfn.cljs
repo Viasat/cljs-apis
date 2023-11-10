@@ -146,3 +146,30 @@
                          (S/replace #"\n*$" "")
                          (.replace line-re prefix))]
           (println output))))))
+
+(defn describe-all-stacks
+  "Perform a ListStacks then a DescribeStack[s] for each stack."
+  [opts]
+  (P/let
+    [{:keys [filter-fn log-fn parallel]} opts
+     aws-opts (select-keys opts [:debug :profile :no-profile :region :role-arn])
+     stack-list (P/->> (aws/invoke :CloudFormation :ListStacks aws-opts)
+                       :StackSummaries)
+     stack-list (if filter-fn (filter filter-fn stack-list) stack-list)
+     _ (when log-fn (log-fn (str "Querying " (count stack-list) " stacks ("
+                                 parallel " at a time)")))
+     stacks (P/loop [left stack-list
+                     res []]
+              (if (empty? left)
+                res
+                (P/let [schunk (take parallel left)
+                        r (P/all
+                           (for [stack schunk]
+                             (aws/invoke
+                              :CloudFormation :DescribeStacks
+                              (merge aws-opts
+                                     {:StackName (:StackId stack)}))))
+                        res (apply conj res (mapcat :Stacks r))]
+                  _ (when log-fn (log-fn (str "Queried " (count res) "/" (count stack-list))))
+                  (P/recur (drop parallel left) res))))]
+    stacks))
