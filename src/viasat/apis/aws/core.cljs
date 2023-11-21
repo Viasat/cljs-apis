@@ -49,7 +49,7 @@
                                       :sessionToken    (:SessionToken creds)}})
                      (P/let [provider (defaultProvider (clj->js prov-opts))]
                        {:credentialDefaultProvider provider}))
-          client (Client. (clj->js (assoc cli-opts :region region)))]
+          client (Client. (clj->js (assoc cli-opts :region region :endpoint (:endpoint-url opts))))]
     client))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
