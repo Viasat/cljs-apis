@@ -100,12 +100,20 @@
                          (inc page) token))
             result))
         (fn [err]
-          (if (or (= "Throttling" (.. err -Code))
-                  (contains? #{"ThrottlingException" "TooManyRequestsException"} (.. err -name)))
+          (cond
+            (or (= "Throttling" (.. err -Code))
+                (contains? #{"ThrottlingException" "TooManyRequestsException"} (.. err -name)))
             (P/let [tdelay (.. err -$metadata -totalRetryDelay)
                     _ (Eprintln "Throttled, delaying" tdelay "ms")
                     _ (P/delay tdelay)]
               (P/recur result opts page last-token))
+
+            (re-seq #"socket disconnected before secure TLS connection" (.. err -Message))
+            (P/let [_ (Eprintln "Socket disconnect before TLS, delaying 1000 ms")
+                    _ (P/delay 1000)]
+              (P/recur result opts page last-token))
+
+            :else
             (throw err)))))))
 
 (defn invoke-until
