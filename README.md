@@ -2,23 +2,68 @@
 
 ## Commands
 
-* `artifactory-docker-query`: Query tags from docker repo in artifactory 
-* `rpm-repo-query`: Query RPM versions from a repomd-style repo
-* `ghe`: Call Github APIs
+### AWS Commands
+
+* `cfn-desc-all`: Describe all stacks including deleted ones (up to 3 months back)
+* `reach`: Run AWS
 * `saws`: Call convenient AWS service/command aliases
 * `saws-all`: Call AWS APIs
 * `stack-run`: Run command on all EC2 instances owned by a stack (using SSM agent)
 
+### Other Commands
+
+* `artifactory-docker-query`: Query tags from docker repo in artifactory
+* `artifactory-npm-query`: Query npm modules in artifactory
+* `ghe`: Call Github APIs
+* `npm-query`: Query npm modules in a Docker hub URL
+* `rpm-repo-query`: Query RPM versions from a repomd-style repo
+* `slackbot-test`: Demo of using viasat.apis.slack for long running Slack app/bot.
+* `slack-thread-notify`: Regex match a Slack message, then update it and/or add thread to it.
+
+
 ## Library Modules
 
-* `viasat.apis.aws.core`: general functions for invoking AWS APIs and invoking lambda functions.
-* `viasat.apis.aws.cfn`: functions for querying and running commands on stack instances.
+* `viasat.apis.artifactory`: authenticate and query artifactory images and storage.
+* `viasat.apis.aws.cfn`: query and run commands on cloudformation stack instances.
+* `viasat.apis.aws.core`: invoke AWS APIs and invoke lambda functions.
+* `viasat.apis.github`: wrappers around Github/GHE APIs
+* `viasat.apis.npm`: authenticate and query npm repositories.
+* `viasat.apis.rpm`: query RPMs in a repomd-style repo.
 * `viasat.apis.saws`: wrappers around AWS service commands (for the `saws` and `saws-all` commands)
-* `viasat.apis.artifactory`: functions for authenticating and querying artifactory images and storage.
-* `viasat.apis.rpm`: functions for querying RPMs in a repomd-style repo.
-* `viasat.apis.github`: functions for all Github/GHE APIs
+* `viasat.apis.slack`: authenticate and use Slack app/bot functionality
+
 
 ## Command Usage
+
+All commands will show detailed help/usage strings if called using
+`--help`.
+
+Here are a few examples for some selected commands:
+
+### artifactory-npm-query
+
+```
+export ARTIFACTORY_BASE_URL=https://example.com/artifactory
+./artifactory-npm-query repo-name
+./artifactory-npm-query repo-name @group/package
+```
+
+### artifactory-docker-query
+
+```
+export ARTIFACTORY_BASE_URL=https://example.com/artifactory
+./artifactory-docker-query docker-repo
+./artifactory-docker-query docker-repo image
+```
+
+### cfn-desc-all
+
+Describe all CloudFormation stacks launched in the past 3 months (the
+limit of the API) and write the full JSON result to a file:
+
+```
+./cfn-desc-all stacks.json
+```
 
 ### ghe
 
@@ -54,6 +99,16 @@ Refer to the API reference at https://octokit.github.io/rest.js/v19
 ./ghe --table --owner foo --repo bar actions listWorkflowRuns workflow_id=2129
 ```
 
+### npm-query
+
+Query packages in an npm registry.
+
+* Show all versions of conlink package in `registry.npmjs.com`:
+
+```
+./npm-query conlink
+```
+
 ### rpm-repo-query
 
 * List CentOS 8 extra RPM packages:
@@ -67,6 +122,50 @@ RPM_REPO_BASE_URL=http://mirror.centos.org ./rpm-repo-query centos-8/8/extras/x8
 
 ```
 ./rpm-repo-query centos-8/8/extras/x86_64/os/ centos-release-stream
+```
+
+### saws
+
+List EC2 instances (ID, name, state, IP, key name, type, launchtime):
+
+```
+./saws ec2 list
+```
+
+Show full JSON for EC2 instances rather than summary table:
+
+```
+./saws --json ec2 list
+```
+
+List ECR repos:
+
+```
+./saws ecr repos
+```
+
+List all tags/versions (sha, push time, last pull time, size, tags) for a specific repo:
+
+```
+./saws ecr tags REPO
+```
+
+Print just tags (one tag per line) for a given REPO:
+
+```
+./saws ecr list REPO
+```
+
+List DynamoDB tables:
+
+```
+./saws db list
+```
+
+Show full JSON content of a specific DynamoDB table:
+
+```
+./saws scan TABLE
 ```
 
 
