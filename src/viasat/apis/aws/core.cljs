@@ -108,7 +108,8 @@
                     _ (P/delay tdelay)]
               (P/recur result opts page last-token))
 
-            (re-seq #"socket disconnected before secure TLS connection" (.. err -Message))
+            (re-seq #"socket disconnected before secure TLS connection" (or (.. err -message)
+                                                                            (.. err -Message)))
             (P/let [_ (Eprintln "Socket disconnect before TLS, delaying 1000 ms")
                     _ (P/delay 1000)]
               (P/recur result opts page last-token))
