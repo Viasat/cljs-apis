@@ -4,15 +4,16 @@
             ["axios$default" :as axios]))
 
 (defn get-package [pkg {:keys [dbg base-url]
-                        :or {dbg identity
-                             base-url "https://registry.npmjs.com"}}]
+                        :or {dbg identity}}]
   (P/let
-    [url (str base-url "/" pkg)
+    [;; set base-url if unset or set but nil
+     base-url (or base-url "https://registry.npmjs.com")
+     url (str base-url "/" pkg)
      _ (dbg "Downloading" url)
      pkg (P/-> (axios url) ->clj :data)]
     pkg))
 
-(defn get-versions [pkg {:keys [dbg base-url] :as opts}]
+(defn get-versions [pkg opts]
   (P/let
     [pkg (get-package pkg opts)
      versions-times (:time pkg)
