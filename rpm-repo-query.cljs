@@ -1,4 +1,8 @@
 #!/usr/bin/env nbb
+
+;; Copyright (c) 2024, Viasat, Inc
+;; Licensed under EPL 2.0
+
 (ns rpm-repo-query
   (:require [promesa.core :as P]
             [viasat.util :refer [parse-opts Epprint Eprintln]]

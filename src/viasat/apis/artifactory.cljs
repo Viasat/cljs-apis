@@ -1,3 +1,6 @@
+;; Copyright (c) 2024, Viasat, Inc
+;; Licensed under EPL 2.0
+
 (ns viasat.apis.artifactory
   (:require [clojure.pprint :refer [pprint]]
             [promesa.core :as P]

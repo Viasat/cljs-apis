@@ -1,5 +1,8 @@
 #!/usr/bin/env nbb
 
+;; Copyright (c) 2024, Viasat, Inc
+;; Licensed under EPL 2.0
+
 (ns reach
   (:require [cljs.pprint :refer [pprint]]
             [clojure.string :as S]

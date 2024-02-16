@@ -2,7 +2,7 @@
   "name": "@viasat/cljs-apis",
   "version": "0.0.1",
   "repository": "https://github.com/viasat/cljs-apis",
-  "license": "Copyright 2022 Viasat, Inc. All Rights Reserved",
+  "license": "SEE LICENSE IN LICENSE",
   "description": "ClojureScript utility libraries and scripts for using various service APIs.",
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.50.0",
