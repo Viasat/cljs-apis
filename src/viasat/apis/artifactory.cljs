@@ -5,13 +5,16 @@
   (:require [clojure.pprint :refer [pprint]]
             [promesa.core :as P]
             [cljs-bean.core :refer [->clj]]
+            ["debug$default" :as debug]
             ["axios$default" :as axios]
             ["axios-retry$default" :as axios-retry]
             ["prompt$default" :as prompt]))
 
 (defn enable-debug []
+  (debug/enable "axios")
   (js/require "axios-debug-log/enable"))
 
+(def log (debug "axios"))
 
 ;; Users can override any of these settings via the by setting
 ;; 'axios-retry' in the axios-opts.
@@ -21,7 +24,7 @@
                :retryDelay axios-retry/exponentialDelay
                :onRetry
                (fn [retryCount, _, requestConfig]
-                 (println "Retry" retryCount "for" (-> requestConfig ->clj :url)))
+                 (log "Retry" retryCount "for" (-> requestConfig ->clj :url)))
                :retryCondition
                (some-fn
                  axios-retry/isNetworkOrIdempotentRequestError
@@ -107,8 +110,8 @@
     (apply concat raw)))
 
 (defn get-npm-modules [repo
-                  {:keys [artifactory-api axios-opts] :as opts}]
-  (P/let [url (str artifactory-api "/search/artifact" )
+                       {:keys [artifactory-api axios-opts] :as opts}]
+  (P/let [url (str artifactory-api "/search/artifact")
           opts (merge axios-opts
                       {:params {:repos repo
                                 :name "package.json"}})
@@ -136,4 +139,3 @@
                                   {:created (get-in data [:time vkey])}))
                          versions))))]
     (apply concat raw)))
-
