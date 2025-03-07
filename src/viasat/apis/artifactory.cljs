@@ -6,10 +6,28 @@
             [promesa.core :as P]
             [cljs-bean.core :refer [->clj]]
             ["axios$default" :as axios]
+            ["axios-retry$default" :as axios-retry]
             ["prompt$default" :as prompt]))
 
 (defn enable-debug []
   (js/require "axios-debug-log/enable"))
+
+
+;; Users can override any of these settings via the by setting
+;; 'axios-retry' in the axios-opts.
+(axios-retry axios
+             (clj->js
+              {:retries 3
+               :retryDelay axios-retry/exponentialDelay
+               :onRetry
+               (fn [retryCount, _, requestConfig]
+                 (println "Retry" retryCount "for" (-> requestConfig ->clj :url)))
+               :retryCondition
+               (some-fn
+                 axios-retry/isNetworkOrIdempotentRequestError
+                 ;; E.g. connection timeouts
+                 #(= (.-code %) "ECONNABORTED"))
+               :shouldResetTimeout true}))
 
 (defn prompt-when-missing-credentials [opts]
   (P/let [{:keys [artifactory-username artifactory-identity-token]} opts
