@@ -10,5 +10,5 @@ die() { echo >&2 "${*}"; exit 1; }
 [ -e "${NBB}" ] || die "Missing ${NBB}. Maybe run 'npm install' in ${TOP_DIR}?"
 
 NODE_PATH="${CUR_DIR}/node_modules":"${TOP_DIR}/node_modules" \
-    exec ${NBB} -cp "${CUR_DIR}/src":"${TOP_DIR}/src":"${CUR_DIR}/node_modules/@viasat/cljs-utils/src":"${TOP_DIR}/node_modules/@viasat/cljs-utils/src" \
+    exec ${NBB} -cp "${CUR_DIR}/src":"${TOP_DIR}/src":"${CUR_DIR}/node_modules/@lonocloud/cljs-utils/src":"${TOP_DIR}/node_modules/@lonocloud/cljs-utils/src" \
     "${TOP_DIR}"/${SCRIPT_NAME}.cljs "${@}"
