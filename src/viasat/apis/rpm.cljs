@@ -12,7 +12,7 @@
 
 (def unzip (promisify zlib/unzip))
 
-(defn get-rpms [repo {:keys [dbg base-url rpm-names]
+(defn get-rpms [repo {:keys [dbg base-url rpm-names axios-opts]
                       :or {dbg identity}}]
   (P/let
     [repo-url (-> (when base-url
@@ -21,7 +21,7 @@
                   (S/replace #"/*$" ""))
      repomd-url (str repo-url "/repodata/repomd.xml")
      _ (dbg "Downloading" repomd-url)
-     resp (P/-> (axios repomd-url) ->clj)
+     resp (P/-> (axios repomd-url (clj->js axios-opts)) ->clj)
 
      _ (dbg "Converting repomd.xml to JSON")
      repomd (->clj (xml2json/toJson (:data resp) #js {:object true}))
@@ -35,7 +35,8 @@
      primary-url (str repo-url "/" primary-path)
 
      _ (dbg "Downloading" primary-url)
-     resp (axios primary-url (clj->js {:responseType "arraybuffer"}))
+     resp (axios primary-url (clj->js (merge axios-opts
+                                             {:responseType "arraybuffer"})))
      _ (dbg "Uncompressing" primary-url)
      primary-data (P/-> (-> resp .-data unzip) .toString)
 

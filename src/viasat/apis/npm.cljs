@@ -6,14 +6,14 @@
             [cljs-bean.core :refer [->clj]]
             ["axios$default" :as axios]))
 
-(defn get-package [pkg {:keys [dbg base-url]
+(defn get-package [pkg {:keys [dbg base-url axios-opts]
                         :or {dbg identity}}]
   (P/let
     [;; set base-url if unset or set but nil
      base-url (or base-url "https://registry.npmjs.com")
      url (str base-url "/" pkg)
      _ (dbg "Downloading" url)
-     pkg (P/-> (axios url) ->clj :data)]
+     pkg (P/-> (axios url (clj->js axios-opts)) ->clj :data)]
     pkg))
 
 (defn get-versions [pkg opts]
