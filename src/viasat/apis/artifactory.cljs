@@ -7,8 +7,7 @@
             [cljs-bean.core :refer [->clj]]
             ["debug$default" :as debug]
             ["axios$default" :as axios]
-            ["axios-retry$default" :as axios-retry]
-            ["prompt$default" :as prompt]))
+            ["axios-retry$default" :as axios-retry]))
 
 (defn enable-debug []
   (debug/enable "axios")
@@ -32,31 +31,23 @@
                  #(= (.-code %) "ECONNABORTED"))
                :shouldResetTimeout true}))
 
-(defn prompt-when-missing-credentials [opts]
-  (P/let [{:keys [artifactory-username artifactory-identity-token]} opts
-          prompt-schema [{:name "artifactory-username"
-                          :description "Artifactory Username"}
-                         {:name "artifactory-identity-token"
-                          :description "Artifactory API Token"
-                          :hidden true}]
-          overrides (merge {}
-                           (when artifactory-username {:artifactory-username artifactory-username})
-                           (when artifactory-identity-token {:artifactory-identity-token artifactory-identity-token}))
-          _ (set! (.-override prompt) (clj->js overrides))
-          _ (set! (.-message prompt) "Please enter")
-          prompt-results (P/-> (.get prompt (clj->js prompt-schema)) ->clj)]
-    (merge opts prompt-results)))
-
 (defn get-auth-headers [opts]
   (let [{:keys [artifactory-username
                 artifactory-identity-token]} opts
-        auth-token (if (and artifactory-username
-                            artifactory-identity-token)
-                     (->
-                       (js/Buffer.from (str artifactory-username ":" artifactory-identity-token))
-                       (.toString "base64"))
-                     (throw (js/Error. "Artifactory username and identity token required.")))]
-    {:Authorization (str "Basic " auth-token)
+        auth (cond
+               (and (not (empty? artifactory-username))
+                    (not (empty? artifactory-identity-token)))
+               (->
+                 (js/Buffer.from (str artifactory-username ":" artifactory-identity-token))
+                 (.toString "base64")
+                 (->> (str "Basic ")))
+
+               (not (empty? artifactory-identity-token))
+               (str "Bearer " artifactory-identity-token)
+
+               :else
+               (throw (js/Error. "Artifactory ID token or username+token required.")))]
+    {:Authorization auth
      :Content-Type "application/json"}))
 
 (defn get-images [repo

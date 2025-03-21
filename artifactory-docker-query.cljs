@@ -33,7 +33,8 @@ Options:
                                       [env: ARTIFACTORY_BASE_URL]
   --artifactory-username USERNAME     Artifactory username
                                       [env: ARTIFACTORY_USERNAME]
-  --artifactory-identity-token TOKEN  Artifactory identity token
+  --artifactory-identity-token TOKEN  Artifactory identity token. If no username is
+                                      provided, then assume this is a bearer token.
                                       [env: ARTIFACTORY_IDENTITY_TOKEN]")
 
 (def IMAGE-SCHEMA
@@ -70,8 +71,6 @@ Options:
    _ (when debug
        (Epprint {:opts opts})
        (art/enable-debug))
-
-   opts (art/prompt-when-missing-credentials opts)
 
    auth-headers (art/get-auth-headers opts)
    opts (assoc opts
