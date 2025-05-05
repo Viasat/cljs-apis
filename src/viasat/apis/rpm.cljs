@@ -8,9 +8,11 @@
             ["node:util" :refer [promisify]]
             ["node:zlib" :as zlib]
             ["axios$default" :as axios]
-            ["xml2json" :as xml2json]))
+            ["fast-xml-parser" :as fastxml]))
 
 (def unzip (promisify zlib/unzip))
+
+(def parser (new fastxml.XMLParser #js {:ignoreAttributes false :attributeNamePrefix "" :textNodeName "$t"}))
 
 (defn get-rpms [repo {:keys [dbg base-url rpm-names axios-opts]
                       :or {dbg identity}}]
@@ -24,7 +26,7 @@
      resp (P/-> (axios repomd-url (clj->js axios-opts)) ->clj)
 
      _ (dbg "Converting repomd.xml to JSON")
-     repomd (->clj (xml2json/toJson (:data resp) #js {:object true}))
+     repomd (->clj (.parse parser (:data resp)))
      primary-path (->> repomd
                        :repomd
                        :data
@@ -41,7 +43,7 @@
      primary-data (P/-> (-> resp .-data unzip) .toString)
 
      _ (dbg "Converting to JSON")
-     primary (->clj (xml2json/toJson primary-data #js {:object true}))
+     primary (->clj (.parse parser primary-data))
      all-rpms (-> primary :metadata :package)
      rpms (if (seq rpm-names)
             (do
