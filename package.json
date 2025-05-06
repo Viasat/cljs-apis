@@ -1,6 +1,6 @@
 {
   "name": "@lonocloud/cljs-apis",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": "https://github.com/viasat/cljs-apis",
   "license": "SEE LICENSE IN LICENSE",
   "description": "ClojureScript utility libraries and scripts for using various service APIs.",
